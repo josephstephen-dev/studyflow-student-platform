@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyFlow — Smart Student Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0b1020;
+      --bg-secondary: #131b32;
+      --panel: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.08);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --primary: #7c3aed;
+      --secondary: #06b6d4;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --radius: 24px;
+      --shadow: 0 25px 60px rgba(0,0,0,0.45);
+      --transition: all .35s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background:
+      radial-gradient(circle at top right, rgba(124,58,237,0.18), transparent 25%),
+      radial-gradient(circle at bottom left, rgba(6,182,212,0.15), transparent 25%),
+      var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 55px 55px;
+      z-index: -2;
+      mask-image: radial-gradient(circle at center, black 35%, transparent 85%);
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 100vh;
+    }
+
+    /* SIDEBAR */
+
+    .sidebar {
+      background: rgba(8,12,24,0.85);
+      border-right: 1px solid rgba(255,255,255,0.05);
+      backdrop-filter: blur(20px);
+      padding: 30px 22px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 45px;
+    }
+
+    .logo-box {
+      width: 50px;
+      height: 50px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 1.2rem;
+      box-shadow: var(--shadow);
+    }
+
+    .logo h2 {
+      font-size: 1.4rem;
+    }
+
+    .menu {
+      display: grid;
+      gap: 10px;
+    }
+
+    .menu a {
+      text-decoration: none;
+      color: var(--muted);
+      padding: 16px 18px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: var(--transition);
+      font-weight: 600;
+    }
+
+    .menu a:hover,
+    .menu a.active {
+      background: rgba(255,255,255,0.06);
+      color: white;
+      transform: translateX(6px);
+    }
+
+    .sidebar-card {
+      margin-top: 35px;
+      background: linear-gradient(145deg, rgba(124,58,237,0.18), rgba(6,182,212,0.12));
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 24px;
+      border-radius: 26px;
+    }
+
+    .sidebar-card h3 {
+      margin-bottom: 10px;
+    }
+
+    .sidebar-card p {
+      color: #cbd5e1;
+      line-height: 1.7;
+      font-size: .95rem;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 14px 20px;
+      border-radius: 16px;
+      font-weight: 700;
+      transition: var(--transition);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      width: 100%;
+      box-shadow: 0 15px 30px rgba(124,58,237,0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+    }
+
+    /* MAIN CONTENT */
+
+    .main {
+      padding: 28px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 35px;
+    }
+
+    .search-box {
+      flex: 1;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 18px 20px 18px 55px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.05);
+      color: white;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .search-box span {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.05);
+      padding: 10px 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .profile img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 28px;
+      margin-bottom: 28px;
+    }
+
+    .hero-card {
+      background: linear-gradient(145deg, rgba(124,58,237,0.16), rgba(6,182,212,0.10));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 32px;
+      padding: 38px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent, rgba(255,255,255,0.05), transparent);
+      transform: translateX(-100%);
+      animation: shine 6s infinite;
+    }
+
+    @keyframes shine {
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    .hero-card h1 {
+      font-size: clamp(2rem, 4vw, 4rem);
+      line-height: 1.05;
+      margin-bottom: 18px;
+    }
+
+    .gradient-text {
+  background: linear-gradient(135deg, #ffffff, #60a5fa, #a78bfa);
+
+  /* Standard */
+  background-clip: text;
+
+  /* WebKit Support */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  /* Fallback */
+  color: transparent;
+
+  display: inline-block;
+}
+
+    .hero-card p {
+      color: #cbd5e1;
+      line-height: 1.8;
+      margin-bottom: 28px;
+      max-width: 650px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.06);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .hero-side {
+      background: rgba(255,255,255,0.05);
+      border-radius: 32px;
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 30px;
+      backdrop-filter: blur(18px);
+    }
+
+    .gpa-ring {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      margin: auto;
+      background: conic-gradient(var(--secondary) 0deg, var(--primary) 300deg, rgba(255,255,255,0.08) 300deg);
+      display: grid;
+      place-items: center;
+      position: relative;
+      margin-bottom: 24px;
+      animation: rotateGlow 6s linear infinite;
+    }
+
+    @keyframes rotateGlow {
+      100% {
+        filter: hue-rotate(360deg);
+      }
+    }
+
+    .gpa-ring::before {
+      content: "";
+      position: absolute;
+      width: 135px;
+      height: 135px;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+    }
+
+    .gpa-content {
+      position: relative;
+      text-align: center;
+      z-index: 2;
+    }
+
+    .gpa-content h2 {
+      font-size: 3rem;
+    }
+
+    .gpa-content span {
+      color: var(--muted);
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 28px;
+      padding: 28px;
+      backdrop-filter: blur(16px);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .tag {
+      padding: 8px 14px;
+      border-radius: 100px;
+      font-size: .8rem;
+      font-weight: 700;
+    }
+
+    .tag.blue {
+      background: rgba(6,182,212,0.15);
+      color: #67e8f9;
+    }
+
+    .tag.green {
+      background: rgba(34,197,94,0.15);
+      color: #86efac;
+    }
+
+    .tag.orange {
+      background: rgba(245,158,11,0.15);
+      color: #fcd34d;
+    }
+
+    .subject-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      font-size: 1.5rem;
+      margin-bottom: 18px;
+      background: linear-gradient(135deg, rgba(124,58,237,0.18), rgba(6,182,212,0.14));
+    }
+
+    .card p {
+      color: var(--muted);
+      line-height: 1.7;
+      margin-top: 10px;
+    }
+
+    .progress {
+      height: 10px;
+      border-radius: 20px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.06);
+      margin-top: 18px;
+    }
+
+    .progress div {
+      height: 100%;
+      border-radius: 20px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+
+    .bottom-layout {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 28px;
+    }
+
+    .assignment-list {
+      display: grid;
+      gap: 18px;
+      margin-top: 25px;
+    }
+
+    .assignment {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      transition: var(--transition);
+    }
+
+    .assignment:hover {
+      transform: translateX(5px);
+    }
+
+    .assignment small {
+      color: var(--muted);
+    }
+
+    .priority {
+      padding: 8px 12px;
+      border-radius: 100px;
+      font-size: .8rem;
+      font-weight: 700;
+    }
+
+    .high {
+      background: rgba(239,68,68,0.15);
+      color: #fca5a5;
+    }
+
+    .medium {
+      background: rgba(245,158,11,0.15);
+      color: #fcd34d;
+    }
+
+    .low {
+      background: rgba(34,197,94,0.15);
+      color: #86efac;
+    }
+
+    .notes-area {
+      margin-top: 25px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .note {
+      padding: 20px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.05);
+      border-left: 4px solid var(--secondary);
+      transition: var(--transition);
+    }
+
+    .note:hover {
+      transform: scale(1.02);
+    }
+
+    .note h4 {
+      margin-bottom: 8px;
+    }
+
+    .note p {
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: .95rem;
+    }
+
+    .activity-chart {
+      display: flex;
+      align-items: end;
+      gap: 12px;
+      height: 220px;
+      margin-top: 35px;
+    }
+
+    .bar {
+      flex: 1;
+      border-radius: 16px 16px 8px 8px;
+      background: linear-gradient(to top, var(--primary), var(--secondary));
+      animation: grow 1s ease forwards;
+      transform-origin: bottom;
+    }
+
+    @keyframes grow {
+      from {
+        transform: scaleY(0);
+      }
+      to {
+        transform: scaleY(1);
+      }
+    }
+
+    .floating {
+      position: fixed;
+      right: 30px;
+      bottom: 30px;
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: grid;
+      place-items: center;
+      font-size: 1.7rem;
+      cursor: pointer;
+      box-shadow: 0 20px 40px rgba(124,58,237,0.4);
+      transition: var(--transition);
+      z-index: 999;
+    }
+
+    .floating:hover {
+      transform: translateY(-6px) scale(1.05);
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: .8s ease;
+    }
+
+    .fade-up.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media(max-width: 1200px) {
+      .section-grid,
+      .hero,
+      .bottom-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media(max-width: 980px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: relative;
+        height: auto;
+      }
+    }
+
+    @media(max-width: 600px) {
+      .topbar {
+        flex-direction: column;
+      }
+
+      .main {
+        padding: 18px;
+      }
+
+      .hero-card,
+      .hero-side,
+      .card {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+      <div class="logo">
+        <div class="logo-box">S</div>
+        <div>
+          <h2>StudyFlow</h2>
+          <small style="color:var(--muted)">Student Workspace</small>
+        </div>
+      </div>
+
+      <nav class="menu">
+        <a href="#" class="active">🏠 Dashboard</a>
+        <a href="#subjects">📚 Subjects</a>
+        <a href="#assignments">📝 Assignments</a>
+        <a href="#notes">📒 Notes</a>
+        <a href="#gpa">🎯 GPA Tracker</a>
+        <a href="#">📅 Calendar</a>
+        <a href="#">⚙ Settings</a>
+      </nav>
+
+      <div class="sidebar-card">
+        <h3>AI Study Assistant</h3>
+        <p>
+          Get smart revision schedules, assignment reminders, and personalized study insights.
+        </p>
+
+        <button class="btn btn-primary">Activate AI Tools</button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+      <div class="topbar fade-up">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" placeholder="Search assignments, notes, subjects...">
+        </div>
+
+        <div class="profile">
+          <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=300&auto=format&fit=crop" alt="Student">
+
+          <div>
+            <h4>David Parker</h4>
+            <small style="color:var(--muted)">Computer Science</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- HERO -->
+
+      <section class="hero">
+
+        <div class="hero-card fade-up">
+          <h1>
+            Organize Your Academic Life with
+            <span class="gradient-text">StudyFlow</span>
+          </h1>
+
+          <p>
+            A futuristic productivity dashboard built for students who want to manage assignments,
+            monitor GPA, organize notes, and stay ahead academically with intelligent workflow systems.
+          </p>
+
+          <div class="hero-actions">
+            <button class="btn btn-primary">Open Workspace</button>
+            <button class="btn btn-secondary">View Analytics</button>
+          </div>
+        </div>
+
+        <div class="hero-side fade-up" id="gpa">
+          <div class="gpa-ring">
+            <div class="gpa-content">
+              <h2 id="gpaValue">3.8</h2>
+              <span>Current GPA</span>
+            </div>
+          </div>
+
+          <div style="text-align:center;">
+            <h3 style="margin-bottom:10px;">Academic Performance</h3>
+            <p style="color:var(--muted); line-height:1.8;">
+              Excellent progress this semester with consistent assignment completion and strong attendance.
+            </p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- SUBJECTS -->
+
+      <section id="subjects" class="section-grid">
+
+        <div class="card fade-up">
+          <div class="card-top">
+            <div class="subject-icon">💻</div>
+            <div class="tag blue">Programming</div>
+          </div>
+
+          <h3>Software Engineering</h3>
+          <p>
+            Full-stack architecture, database systems, and software design principles.
+          </p>
+
+          <div class="progress">
+            <div style="width:88%"></div>
+          </div>
+        </div>
+
+        <div class="card fade-up">
+          <div class="card-top">
+            <div class="subject-icon">📊</div>
+            <div class="tag green">Analytics</div>
+          </div>
+
+          <h3>Data Science</h3>
+          <p>
+            Data visualization, statistics, machine learning concepts, and predictive analysis.
+          </p>
+
+          <div class="progress">
+            <div style="width:72%"></div>
+          </div>
+        </div>
+
+        <div class="card fade-up">
+          <div class="card-top">
+            <div class="subject-icon">🧠</div>
+            <div class="tag orange">Research</div>
+          </div>
+
+          <h3>Artificial Intelligence</h3>
+          <p>
+            Neural networks, intelligent systems, deep learning, and AI ethics.
+          </p>
+
+          <div class="progress">
+            <div style="width:91%"></div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- BOTTOM SECTION -->
+
+      <section class="bottom-layout">
+
+        <!-- ASSIGNMENTS -->
+
+        <div class="card fade-up" id="assignments">
+          <div class="card-top">
+            <h2>Upcoming Assignments</h2>
+            <div class="tag blue">4 Pending</div>
+          </div>
+
+          <div class="assignment-list">
+
+            <div class="assignment">
+              <div>
+                <h4>Machine Learning Report</h4>
+                <small>Due: Monday • AI Department</small>
+              </div>
+
+              <div class="priority high">High</div>
+            </div>
+
+            <div class="assignment">
+              <div>
+                <h4>Database Schema Design</h4>
+                <small>Due: Wednesday • Software Engineering</small>
+              </div>
+
+              <div class="priority medium">Medium</div>
+            </div>
+
+            <div class="assignment">
+              <div>
+                <h4>Statistics Quiz Revision</h4>
+                <small>Due: Friday • Data Science</small>
+              </div>
+
+              <div class="priority low">Low</div>
+            </div>
+
+            <div class="assignment">
+              <div>
+                <h4>UI/UX Prototype Presentation</h4>
+                <small>Due: Saturday • Product Design</small>
+              </div>
+
+              <div class="priority high">High</div>
+            </div>
+
+          </div>
+
+          <div class="activity-chart">
+            <div class="bar" style="height:40%"></div>
+            <div class="bar" style="height:55%"></div>
+            <div class="bar" style="height:65%"></div>
+            <div class="bar" style="height:80%"></div>
+            <div class="bar" style="height:70%"></div>
+            <div class="bar" style="height:100%"></div>
+          </div>
+        </div>
+
+        <!-- NOTES -->
+
+        <div class="card fade-up" id="notes">
+          <div class="card-top">
+            <h2>Quick Notes</h2>
+            <div class="tag green">Synced</div>
+          </div>
+
+          <div class="notes-area">
+
+            <div class="note">
+              <h4>AI Project Reminder</h4>
+              <p>
+                Finish neural network optimization slides before Thursday presentation.
+              </p>
+            </div>
+
+            <div class="note">
+              <h4>Study Strategy</h4>
+              <p>
+                Focus more on SQL optimization and advanced joins for next assessment.
+              </p>
+            </div>
+
+            <div class="note">
+              <h4>Lecture Highlight</h4>
+              <p>
+                Professor emphasized algorithm efficiency and memory management concepts.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <div class="floating" id="themeToggle">☾</div>
+
+  <script>
+
+    // Scroll Reveal Animation
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          entry.target.classList.add('active');
+        }
+      });
+    }, {
+      threshold: 0.15
+    });
+
+    document.querySelectorAll('.fade-up').forEach(el => {
+      observer.observe(el);
+    });
+
+
+    // GPA Counter Animation
+
+    const gpaElement = document.getElementById('gpaValue');
+    let currentGpa = 0;
+    const finalGpa = 3.8;
+
+    const animateGPA = () => {
+      currentGpa += 0.05;
+
+      if(currentGpa < finalGpa){
+        gpaElement.innerText = currentGpa.toFixed(1);
+        requestAnimationFrame(animateGPA);
+      } else {
+        gpaElement.innerText = finalGpa.toFixed(1);
+      }
+    };
+
+    animateGPA();
+
+
+    // Dynamic Theme Effect
+
+    const themeToggle = document.getElementById('themeToggle');
+    let darkMode = true;
+
+    themeToggle.addEventListener('click', () => {
+      darkMode = !darkMode;
+
+      if(!darkMode){
+        document.documentElement.style.setProperty('--bg', '#eef2ff');
+        document.documentElement.style.setProperty('--bg-secondary', '#ffffff');
+        document.documentElement.style.setProperty('--text', '#0f172a');
+        document.documentElement.style.setProperty('--muted', '#475569');
+        themeToggle.innerText = '☀';
+      } else {
+        document.documentElement.style.setProperty('--bg', '#0b1020');
+        document.documentElement.style.setProperty('--bg-secondary', '#131b32');
+        document.documentElement.style.setProperty('--text', '#f8fafc');
+        document.documentElement.style.setProperty('--muted', '#94a3b8');
+        themeToggle.innerText = '☾';
+      }
+    });
+
+
+    // Search Interaction
+
+    const searchInput = document.querySelector('.search-box input');
+
+    searchInput.addEventListener('focus', () => {
+      searchInput.style.boxShadow = '0 0 0 4px rgba(124,58,237,0.25)';
+    });
+
+    searchInput.addEventListener('blur', () => {
+      searchInput.style.boxShadow = 'none';
+    });
+
+
+    // Floating Cursor Glow
+
+    document.addEventListener('mousemove', e => {
+      const glow = document.createElement('div');
+
+      glow.style.position = 'fixed';
+      glow.style.left = e.clientX + 'px';
+      glow.style.top = e.clientY + 'px';
+      glow.style.width = '10px';
+      glow.style.height = '10px';
+      glow.style.borderRadius = '50%';
+      glow.style.pointerEvents = 'none';
+      glow.style.background = 'rgba(124,58,237,0.22)';
+      glow.style.filter = 'blur(10px)';
+      glow.style.zIndex = '9999';
+
+      document.body.appendChild(glow);
+
+      setTimeout(() => {
+        glow.remove();
+      }, 200);
+    });
+
+  </script>
+
+</body>
+</html>
